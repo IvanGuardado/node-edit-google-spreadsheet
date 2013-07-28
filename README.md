@@ -77,6 +77,40 @@ Read sheet:
 
   }
 ```
+#### Metadata
+
+Get metadata
+
+``` js
+  function sheetReady(err, spreadsheet) {
+    if(err) throw err;
+    
+    spreadsheet.metadata(function(err, metadata){
+      if(err) throw err;
+      console.log(metadata);
+      // { title: 'Sheet3', rowCount: '100', colCount: '20', updated: [Date] }
+    });
+  }
+```
+
+Set metadata
+
+``` js
+  function sheetReady(err, spreadsheet) {
+    if(err) throw err;
+    
+    spreadsheet.metadata({
+      title: 'Sheet2'
+      rowCount: 100,
+      colCount: 20
+    }, function(err, metadata){
+      if(err) throw err;
+      console.log(metadata);
+    });
+  }
+```
+
+***WARNING: all cells outside the range of the new size will be silently deleted***
 
 #### More `add` Examples
 
@@ -121,11 +155,18 @@ spreadsheet.add({
 
 #### API
 
+
+##### `Spreadsheet.create( options )`
+
+See [Options](#Options) below
+
 ##### spreadsheet.`add( obj | array )`
 Add cells to the batch. See examples.
 
-##### spreadsheet.`send( callback( err ) )`
+##### spreadsheet.`send( [options,] callback( err ) )`
 Sends off the batch of `add()`ed cells. Clears all cells once complete.
+
+`options.autoSize` When required, increase the worksheet size (rows and columns) in order to fit the batch (default `false`).
 
 ##### spreadsheet.`receive( callback( err , rows , info ) )`
 Recieves the entire spreadsheet. The `rows` object is an object in the same format as the cells you `add()`, so `add(rows)` will be valid. The `info` object looks like:
@@ -143,6 +184,13 @@ Recieves the entire spreadsheet. The `rows` object is an object in the same form
   nextRow: 4
 }
 ```
+
+##### spreadsheet.`metadata( [data, ] callback )`
+
+Get and set metadata
+
+*Note: when setting new metadata, if `rowCount` and/or `colCount` is left out,
+an extra request will be made to retrieve the missing data.*
 
 #### Options
 
@@ -179,11 +227,9 @@ Whether to use `https` when connecting to Google (default: `true`)
 
 #### Credits
 
-Thanks to `googleclientlogin` for Google API ClientLogin Tokens and `google-oauth-jwt` for OAuth Tokens.
+Thanks to `googleclientlogin` for easy Google API ClientLogin Tokens
 
 #### References
 
 * https://developers.google.com/google-apps/spreadsheets/
 * https://developers.google.com/google-apps/documents-list/
-
-
